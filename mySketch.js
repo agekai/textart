@@ -39,23 +39,47 @@ function drawAxesText() {
   fill(glowColor);
   noStroke();
 
+  let exclusionRadius = 50; // 避免畫到火焰字的區域
+
   for (let i = -width; i < width; i += 20) {
-		if((i==0)){}
-		else{text("線", i, 0);}
+    if (dist(i, 0, 0, 0) > exclusionRadius-20 && i !== 0) {
+      text("線", i, 0);
+    }
   }
+
   for (let j = -height; j < height; j += 20) {
-		if((j==0) || (j==-20) ){}
-    else{text("線", 0, j);}
+    if (dist(0, j, 0, 0) > exclusionRadius && j !== 0 && j !== -20) {
+      text("線", 0, j);
+    }
   }
 }
-
 function drawFireText() {
-  let flicker = map(sin(frameCount * 0.01), -1, 1, 100, 255);
-  let flameColor = color(255, 100, 0, flicker);
-  textSize(40);
-  fill(flameColor);
+  let flicker = map(sin(frameCount * 0.03), -1, 1, 100, 255);
+  fill(255, 100 + random(20), 0, flicker);
   noStroke();
-  text("火", 0, 0);
+
+  let layers = [
+		{ count: 2, y: 45, size: 16 },
+		{ count: 3, y: 30, size: 18 },
+    { count: 4, y: 15, size: 22 },
+    { count: 3, y: 0, size: 24 },
+    { count: 2, y: -15, size: 26 },
+    { count: 1, y: -35, size: 28 },
+  ];
+
+  for (let layer of layers) {
+    let spacing = 18;
+    let offsetX = -(layer.count - 1) * spacing / 2;
+
+    // 增加「風」效果，讓火焰有點飄動感
+    let windEffect = sin(frameCount * 0.1 + layer.y * 0.1) * 3;
+
+    textSize(layer.size);
+    for (let i = 0; i < layer.count; i++) {
+      let wobble = sin(frameCount * 0.1 + i) * 1.5 + windEffect;
+      text("火", offsetX + i * spacing + wobble, layer.y);
+    }
+  }
 }
 
 // ---------- 閃現的「點」們 ----------
